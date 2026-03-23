@@ -68,7 +68,7 @@ func (c *iw4x_client) send_command(command string) (string, error) {
         hashed_command := sha512.Sum512([]byte(command)) // iw4x expects sha512 for command hashing
         signature, err := rsa.SignPKCS1v15(rand.Reader, c.PrivateKey, crypto.SHA512, hashed_command[:]) // iw4x expects PKCS1v15 padding
         if err != nil {
-            fmt.Errorf("failed to sign command: %w", err)
+            return "", fmt.Errorf("failed to sign command: %w", err)
         }
 
         // the expected packet structure from this: \xff\xff\xff\xffrconSafe <command_tag><command_length><command> <signature_tag><signature_length><signature>
@@ -94,7 +94,7 @@ func (c *iw4x_client) send_command(command string) (string, error) {
     // send the command
     _, err := c.Connection.Write([]byte(packet))
     if err != nil {
-        return "", fmt.Errorf("%w", err)
+        return "", fmt.Errorf("failed to send command to server: %w", err)
     }
 
     // this is our timeout for the command
@@ -105,7 +105,7 @@ func (c *iw4x_client) send_command(command string) (string, error) {
     // gos `net` stack will take care of fragmented packets here so this doesn't need to loop
     raw_response, err := c.Connection.Read(buf) // read response into that chunk
     if err != nil {
-        return "", fmt.Errorf("%w", err)
+        return "", fmt.Errorf("failed to read server response: %w", err)
     }
 
     // cleaning up the response to be output
