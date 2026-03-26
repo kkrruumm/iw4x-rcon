@@ -45,7 +45,10 @@ func spawn_session(addr string, password string, key_path string) (*iw4x_client,
 
         private_key, err := x509.ParsePKCS8PrivateKey(block.Bytes) // openssl default as of the time of writing
         if err != nil {
-            return nil, fmt.Errorf("failed to parse RSA key: %w", err)
+            private_key, err = x509.ParsePKCS1PrivateKey(block.Bytes)
+            if err != nil {
+                return nil, fmt.Errorf("failed to parse RSA key (tried both PKCS8 and PKCS1): %w", err)
+            }
         }
 
         var rsa_private_key *rsa.PrivateKey
