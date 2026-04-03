@@ -34,10 +34,13 @@ jobs:
         run: GOOS=windows GOARCH=amd64 go build -ldflags "-s -w" -o iw4x-rcon.exe
 
       - name: Generate Checksums
-        run: sha256sum iw4x-rcon-*
+        run: sha256sum iw4x-rcon iw4x-rcon-musl iw4x-rcon.exe
 
       - name: Add to release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release upload ${{ github.event.release.tag_name }} iw4x-rcon-*
+          gh release upload ${{ github.event.release.tag_name }} \
+            iw4x-rcon \
+            iw4x-rcon-musl \
+            iw4x-rcon.exe
