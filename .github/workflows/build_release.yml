@@ -28,7 +28,7 @@ jobs:
         run: GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o iw4x-rcon 
 
       - name: Build Linux (musl/static)
-        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" iw4x-rcon-musl
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o iw4x-rcon-musl
 
       - name: Build Windows
         run: GOOS=windows GOARCH=amd64 go build -ldflags "-s -w" -o iw4x-rcon.exe
