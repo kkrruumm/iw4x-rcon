@@ -1,0 +1,42 @@
+# this workflow builds and pushes a release
+# whenever a new release is made on this repository
+
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: Build Linux
+        run: GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o iw4x-rcon 
+
+      - name: Build Windows
+        run: GOOS=windows GOARCH=amd64 go build -ldflags "-s -w" -o iw4x-rcon.exe
+
+      - name: Generate Checksums
+        run: sha256sum iw4x-rcon iw4x-rcon.exe
+
+      - name: Add to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} \
+            iw4x-rcon \
+            iw4x-rcon.exe
